@@ -48,6 +48,7 @@ public class FamilyService {
         dto.setId(family.getId());
         dto.setDirection(family.getDirection());
         dto.setReasibAdmission(family.getReasibAdmission());
+        dto.setStatus(family.getStatus());
     
         return basicServiceRepository.findById(family.getBasicServiceServiceId())
             .flatMap(basicService -> {
@@ -270,6 +271,24 @@ public class FamilyService {
     }    
 
     public Mono<Void> deleteFamily(Integer id) {
-        return familyRepository.deleteById(id);
+        return familyRepository.findById(id)
+            .flatMap(family -> {
+                family.setStatus("I");
+                return familyRepository.save(family).then();
+            });
     }
+
+    public Mono<Void> activeFamily(Integer id) {
+        return familyRepository.findById(id)
+            .flatMap(family -> {
+                family.setStatus("A");
+                return familyRepository.save(family).then();
+            });
+    }
+
+    public Mono<FamilyDTO> findDetailById(Integer id) {
+        return familyRepository.findById(id)
+                .flatMap(this::populateRelatedEntities);
+    }
+
 }

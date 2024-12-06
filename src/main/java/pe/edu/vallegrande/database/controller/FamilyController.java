@@ -7,7 +7,7 @@ import pe.edu.vallegrande.database.dto.FamilyDTO;
 import pe.edu.vallegrande.database.service.FamilyService;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/families")
 public class FamilyController {
@@ -30,9 +30,16 @@ public class FamilyController {
         return ResponseEntity.status(HttpStatus.OK).body(families);
     }
 
+    @GetMapping("/detail/{id}")
+    public Mono<ResponseEntity<FamilyDTO>> getFamilyDetailById(@PathVariable Integer id) {
+        return familyService.findDetailById(id)
+                .map(familyDTO -> ResponseEntity.ok(familyDTO))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/{id}")
     public Mono<ResponseEntity<FamilyDTO>> getFamilyById(@PathVariable Integer id) {
-        return familyService.findById(id) // Implementa este método en FamilyService
+        return familyService.findById(id)
             .map(familyDTO -> ResponseEntity.ok(familyDTO))
             .defaultIfEmpty(ResponseEntity.notFound().build());
     }
@@ -51,5 +58,29 @@ public class FamilyController {
         return familyService.updateFamily(id, familyDTO)
             .map(updatedFamilyDTO -> ResponseEntity.ok(updatedFamilyDTO))
             .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/delete/{id}")
+    public Mono<ResponseEntity<Object>> deleteFamily(@PathVariable Integer id) {
+        return familyService.deleteFamily(id) // Cambia este método en tu servicio para manejar el eliminado lógico
+            .then(Mono.just(ResponseEntity.noContent().build()))
+            .onErrorResume(e -> {
+                if (e instanceof IllegalArgumentException) {
+                    return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()));
+                }
+                return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred"));
+            });
+    }
+
+    @PutMapping("/active/{id}")
+    public Mono<ResponseEntity<Object>> activeFamily(@PathVariable Integer id) {
+        return familyService.activeFamily(id) // Cambia este método en tu servicio para manejar el eliminado lógico
+            .then(Mono.just(ResponseEntity.noContent().build()))
+            .onErrorResume(e -> {
+                if (e instanceof IllegalArgumentException) {
+                    return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage()));
+                }
+                return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred"));
+            });
     }
 }

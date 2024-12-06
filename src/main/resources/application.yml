@@ -1,8 +1,35 @@
 spring:
   application:
-    name : database
+    name: database
 
   r2dbc:
     url: r2dbc:postgresql://ep-young-morning-a492t7vp.us-east-1.aws.neon.tech:5432/neondb?sslmode=require
     username: neondb_owner
     password: HPX6oUdLnR1G
+    pool:
+      max-size: 20
+      min-size: 5
+      validation-query: SELECT 1
+
+logging:
+  level:
+    io.r2dbc: DEBUG
+    org.springframework.r2dbc: DEBUG
+
+  # Configuración de tiempo de espera
+  datasource:
+    initialization-mode: always
+    initialization-timeout: 10s
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    export:
+      prometheus:
+        enabled: true
