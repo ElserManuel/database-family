@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: database-config
+  namespace: vallegrande
+data:
+  DATABASE_URL: "r2dbc:postgresql://ep-young-morning-a492t7vp.us-east-1.aws.neon.tech:5432/neondb?sslmode=require"        # Reemplaza con tu URL
+  DATABASE_USERNAME: "neondb_owner"
