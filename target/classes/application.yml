@@ -4,9 +4,9 @@ spring:
 
   r2dbc:
     # Conexión a bd Person
-    url: ${R2DBC_URL} # r2dbc:postgresql://ep-morning-cake-a46o3cf8-pooler.us-east-1.aws.neon.tech:5432/neondb?sslmode=require
-    username: ${R2DBC_USERNAME} # neondb_owner
-    password: ${R2DBC_PASSWORD} # npg_tGu4yQWLh9jb
+    url: r2dbc:postgresql://ep-morning-cake-a46o3cf8-pooler.us-east-1.aws.neon.tech:5432/neondb?sslmode=require
+    username: neondb_owner
+    password: npg_tGu4yQWLh9jb
 
     pool:
       max-size: 20
@@ -14,7 +14,7 @@ spring:
       validation-query: SELECT 1
 
   kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS} # pkc-p11xm.us-east-1.aws.confluent.cloud:9092
+    bootstrap-servers: pkc-p11xm.us-east-1.aws.confluent.cloud:9092
     consumer:
       group-id: person-service-group
       auto-offset-reset: earliest
@@ -24,11 +24,16 @@ spring:
         spring.json.trusted.packages: pe.edu.vallegrande.database.event
         security.protocol: SASL_SSL
         sasl.mechanism: PLAIN
-        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${KAFKA_USERNAME}" password="${KAFKA_PASSWORD}";
-        #sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="ZOIIGPQD6OCOVHCZ" password="Xdy9C0r1SLJ3TY0emLqgqhWa3JEvn9Qr2meiJi4aQItksjotxGS2y02cTwM2c4rT";
+        sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="ZOIIGPQD6OCOVHCZ" password="Xdy9C0r1SLJ3TY0emLqgqhWa3JEvn9Qr2meiJi4aQItksjotxGS2y02cTwM2c4rT";
 
   family:
-    service-url: ${FAMILY_SERVICE_URL} # https://humble-fortnight-5gx4qp46qj672vg5r-8081.app.github.dev
+    service-url: http://localhost:8081
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://securetoken.google.com/security-prs1
 
 logging:
   level:

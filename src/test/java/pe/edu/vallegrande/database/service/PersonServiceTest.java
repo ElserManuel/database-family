@@ -1,9 +1,32 @@
 package pe.edu.vallegrande.database.service;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import pe.edu.vallegrande.database.client.FamilyServiceClient;
+import pe.edu.vallegrande.database.model.Person;
+import pe.edu.vallegrande.database.repository.PersonRepository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+import reactor.test.StepVerifier;
+
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Comparator;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.when;
+
 public class PersonServiceTest {
-    /*
+
     @Mock
     private PersonRepository personRepository;
+
+    @Mock
+    private FamilyServiceClient familyServiceClient;
 
     @InjectMocks
     private PersonService personService;
@@ -14,64 +37,245 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void testFindById_PersonFound() {
-        Person person = new Person(1, "John", "Doe", 30, LocalDate.of(1993, 1, 1), "DNI", "12345678", "Sibling", "Yes",
-                "A", null);
+    public void testListActive() {
+        // Datos de prueba
+        Person person1 = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "A", 1);
+        Person person2 = new Person(2, "María", "López", 28, LocalDate.of(1995, 5, 15),
+                "DNI", "87654321", "Madre", "No", "A", 1);
+
+        // Configuración del mock
+        when(personRepository.findByState("A")).thenReturn(Flux.just(person2, person1));
+
+        // Ejecución de la prueba
+        Flux<Person> result = personService.listActive();
+
+        // Verificación
+        StepVerifier.create(result)
+                .expectNext(person1) // Ordenado por ID, primero person1
+                .expectNext(person2)
+                .verifyComplete();
+    }
+
+    @Test
+    public void testListInactive() {
+        // Datos de prueba
+        Person person1 = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "I", 1);
+        Person person2 = new Person(2, "María", "López", 28, LocalDate.of(1995, 5, 15),
+                "DNI", "87654321", "Madre", "No", "I", 1);
+
+        // Configuración del mock
+        when(personRepository.findByState("I")).thenReturn(Flux.just(person2, person1));
+
+        // Ejecución de la prueba
+        Flux<Person> result = personService.listInactive();
+
+        // Verificación
+        StepVerifier.create(result)
+                .expectNext(person1) // Ordenado por ID, primero person1
+                .expectNext(person2)
+                .verifyComplete();
+    }
+
+    @Test
+    public void testCreatePersons_WithValidFamily() {
+        // Datos de prueba
+        Person person = new Person(null, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", null, 1);
+        Person savedPerson = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "A", 1);
+
+        // Configuración de los mocks
+        when(familyServiceClient.familyExists(1)).thenReturn(Mono.just(true));
+        when(personRepository.save(any(Person.class))).thenReturn(Mono.just(savedPerson));
+
+        // Ejecución de la prueba
+        Flux<Person> result = personService.createPersons(Flux.just(person));
+
+        // Verificación
+        StepVerifier.create(result)
+                .expectNext(savedPerson)
+                .verifyComplete();
+    }
+
+    @Test
+    public void testCreatePersons_WithInvalidFamily() {
+        // Datos de prueba
+        Person person = new Person(null, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", null, 999);
+
+        // Configuración de los mocks
+        when(familyServiceClient.familyExists(999)).thenReturn(Mono.just(false));
+
+        // Ejecución de la prueba
+        Flux<Person> result = personService.createPersons(Flux.just(person));
+
+        // Verificación
+        StepVerifier.create(result)
+                .expectErrorMatches(throwable ->
+                        throwable instanceof RuntimeException &&
+                                throwable.getMessage().contains("familia con ID 999 no existe"))
+                .verify();
+    }
+
+    @Test
+    public void testCreatePersons_WithoutFamily() {
+        // Datos de prueba
+        Person person = new Person(null, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", null, null);
+        Person savedPerson = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "A", null);
+
+        // Configuración del mock
+        when(personRepository.save(any(Person.class))).thenReturn(Mono.just(savedPerson));
+
+        // Ejecución de la prueba
+        Flux<Person> result = personService.createPersons(Flux.just(person));
+
+        // Verificación
+        StepVerifier.create(result)
+                .expectNext(savedPerson)
+                .verifyComplete();
+    }
+
+    @Test
+    public void testLogicallyDelete() {
+        // Datos de prueba
+        Person person = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "A", 1);
+        Person inactivePerson = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "I", 1);
+
+        // Configuración de los mocks
         when(personRepository.findById(1)).thenReturn(Mono.just(person));
+        when(personRepository.save(any(Person.class))).thenReturn(Mono.just(inactivePerson));
 
-        Mono<Person> result = personService.findById(1);
-        assertEquals("John", result.block().getName());
-        verify(personRepository).findById(1);
+        // Ejecución de la prueba
+        Mono<Person> result = personService.logicallyDelete(1);
+
+        // Verificación
+        StepVerifier.create(result)
+                .expectNext(inactivePerson)
+                .verifyComplete();
     }
 
     @Test
-    public void testSaveAll() {
-        Person person1 = new Person(null, "Alice", "Smith", 25, LocalDate.of(1998, 5, 15), "DNI", "87654321", "Child",
-                "No", null, null);
-        Person person2 = new Person(null, "Bob", "Brown", 40, LocalDate.of(1983, 6, 20), "DNI", "23456789", "Parent",
-                "Yes", null, null);
+    public void testReactivate() {
+        // Datos de prueba
+        Person person = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "I", 1);
+        Person activePerson = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "A", 1);
 
-        when(personRepository.save(any(Person.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        // Configuración de los mocks
+        when(personRepository.findById(1)).thenReturn(Mono.just(person));
+        when(personRepository.save(any(Person.class))).thenReturn(Mono.just(activePerson));
 
-        // Cambia el tipo de retorno a Mono<List<Person>>
-        Mono<List<Person>> result = personService.saveAll(Flux.just(person1, person2)).collectList();
+        // Ejecución de la prueba
+        Mono<Person> result = personService.reactivate(1);
 
-        // Bloquea el Mono para obtener la lista
-        List<Person> personList = result.block();
-
-        assertEquals(2, personList.size());
-        verify(personRepository, times(2)).save(any(Person.class));
+        // Verificación
+        StepVerifier.create(result)
+                .expectNext(activePerson)
+                .verifyComplete();
     }
 
     @Test
-    public void testUpdate_PersonExists() {
-        Person existingPerson = new Person(1, "John", "Doe", 30, LocalDate.of(1993, 1, 1), "DNI", "12345678", "Sibling",
-                "Yes", "A", null);
-        Person updatedPerson = new Person(null, "Jane", "Doe", 28, LocalDate.of(1995, 2, 2), "DNI", "12345679",
-                "Sibling", "Yes", null, null);
+    public void testListByFamily() {
+        // Datos de prueba
+        Person person1 = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "A", 1);
+        Person person2 = new Person(2, "María", "López", 28, LocalDate.of(1995, 5, 15),
+                "DNI", "87654321", "Madre", "No", "A", 1);
 
-        when(personRepository.findById(1)).thenReturn(Mono.just(existingPerson));
-        when(personRepository.save(any(Person.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        // Configuración del mock
+        when(personRepository.findByFamilyIdFamily(1)).thenReturn(Flux.just(person1, person2));
 
-        Mono<Person> result = personService.update(1, updatedPerson);
+        // Ejecución de la prueba
+        Flux<Person> result = personService.listByFamily(1);
 
-        assertEquals("Jane", result.block().getName());
-        verify(personRepository).findById(1);
-        verify(personRepository).save(any(Person.class));
+        // Verificación
+        StepVerifier.create(result)
+                .expectNext(person1)
+                .expectNext(person2)
+                .verifyComplete();
     }
 
     @Test
-    public void testLogicalDelete_PersonExists() {
-        Person existingPerson = new Person(1, "John", "Doe", 30, LocalDate.of(1993, 1, 1), "DNI", "12345678", "Sibling",
-                "Yes", "A", null);
+    public void testUpdatePerson() {
+        // Datos de prueba
+        Person originalPerson = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "A", 1);
+        Person updatedPersonData = new Person(null, "Juan Carlos", "Pérez Gómez", 31, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "A", 2);
+        Person resultPerson = new Person(1, "Juan Carlos", "Pérez Gómez", 31, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "A", 2);
 
-        when(personRepository.findById(1)).thenReturn(Mono.just(existingPerson));
-        when(personRepository.save(any(Person.class))).thenAnswer(invocation -> Mono.just(invocation.getArgument(0)));
+        // Configuración de los mocks
+        when(personRepository.findById(1)).thenReturn(Mono.just(originalPerson));
+        when(personRepository.save(any(Person.class))).thenReturn(Mono.just(resultPerson));
 
-        Mono<Person> result = personService.logicalDelete(1);
+        // Ejecución de la prueba
+        Mono<Person> result = personService.updatePerson(1, updatedPersonData);
 
-        assertEquals("I", result.block().getState());
-        verify(personRepository).findById(1);
-        verify(personRepository).save(any(Person.class));
-    } */
+        // Verificación
+        StepVerifier.create(result)
+                .expectNext(resultPerson)
+                .verifyComplete();
+    }
+
+    @Test
+    public void testDeletePersonsByFamilyId() {
+        // Datos de prueba
+        Person person1 = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "A", 1);
+        Person person2 = new Person(2, "María", "López", 28, LocalDate.of(1995, 5, 15),
+                "DNI", "87654321", "Madre", "No", "A", 1);
+
+        Person inactivePerson1 = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "I", 1);
+        Person inactivePerson2 = new Person(2, "María", "López", 28, LocalDate.of(1995, 5, 15),
+                "DNI", "87654321", "Madre", "No", "I", 1);
+
+        // Configuración de los mocks
+        when(personRepository.findByFamilyIdFamily(1)).thenReturn(Flux.just(person1, person2));
+        when(personRepository.save(any(Person.class))).thenReturn(Mono.just(inactivePerson1), Mono.just(inactivePerson2));
+
+        // Ejecución de la prueba
+        Flux<Person> result = personService.deletePersonsByFamilyId(1);
+
+        // Verificación
+        StepVerifier.create(result)
+                .expectNext(inactivePerson1)
+                .expectNext(inactivePerson2)
+                .verifyComplete();
+    }
+
+    @Test
+    public void testReactivatePersonsByFamilyId() {
+        // Datos de prueba
+        Person person1 = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "I", 1);
+        Person person2 = new Person(2, "María", "López", 28, LocalDate.of(1995, 5, 15),
+                "DNI", "87654321", "Madre", "No", "I", 1);
+
+        Person activePerson1 = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
+                "DNI", "12345678", "Padre", "No", "A", 1);
+        Person activePerson2 = new Person(2, "María", "López", 28, LocalDate.of(1995, 5, 15),
+                "DNI", "87654321", "Madre", "No", "A", 1);
+
+        // Configuración de los mocks
+        when(personRepository.findByFamilyIdFamily(1)).thenReturn(Flux.just(person1, person2));
+        when(personRepository.save(any(Person.class))).thenReturn(Mono.just(activePerson1), Mono.just(activePerson2));
+
+        // Ejecución de la prueba
+        Flux<Person> result = personService.reactivatePersonsByFamilyId(1);
+
+        // Verificación
+        StepVerifier.create(result)
+                .expectNext(activePerson1)
+                .expectNext(activePerson2)
+                .verifyComplete();
+    }
 }
