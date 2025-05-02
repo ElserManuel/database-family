@@ -6,11 +6,13 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.List;
 
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
-
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
@@ -24,10 +26,10 @@ public class SecurityConfig {
                 )
                 .cors(cors -> cors
                         .configurationSource(exchange -> {
-                            var config = new org.springframework.web.cors.CorsConfiguration();
+                            var config = new CorsConfiguration();
                             config.setAllowCredentials(true);
-                            // Especifica el origen permitido
-                            config.addAllowedOrigin("http://localhost:4200"); // Cambia esto si tu frontend está en otro origen
+                            // Permitir cualquier origen
+                            config.setAllowedOriginPatterns(List.of("*"));
                             config.addAllowedHeader("*");
                             config.addAllowedMethod("*");
                             return config;
