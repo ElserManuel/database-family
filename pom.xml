@@ -34,6 +34,10 @@
 	<properties>
 		<java.version>17</java.version>
 	</properties>
+	<properties>
+			<sonar.organization>elsermanuel</sonar.organization>
+			<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+		</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -68,10 +72,7 @@
 			<groupId>io.r2dbc</groupId>
 			<artifactId>r2dbc-pool</artifactId>
 		</dependency>
-		<properties>
-			<sonar.organization>elsermanuel</sonar.organization>
-			<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-		</properties><!-- Lombok -->
+		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
