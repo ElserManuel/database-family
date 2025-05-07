@@ -34,4 +34,12 @@ jobs:
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          R2DBC_URL: ${{ secrets.R2DBC_URL }}
+          R2DBC_USERNAME: ${{ secrets.R2DBC_USERNAME }}
+          R2DBC_PASSWORD: ${{ secrets.R2DBC_PASSWORD }}
+          KAFKA_BOOTSTRAP_SERVERS: ${{ secrets.KAFKA_BOOTSTRAP_SERVERS }}
+          KAFKA_USERNAME: ${{ secrets.KAFKA_USERNAME }}
+          KAFKA_PASSWORD: ${{ secrets.KAFKA_PASSWORD }}
+          FAMILY_SERVICE_URL: ${{ secrets.FAMILY_SERVICE_URL }}
+          
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=ElserManuel_database-family
