@@ -19,25 +19,16 @@ public class PersonController {
         this.personService = personService;
     }
 
-    /**
-     * Lista todas las personas activas
-     */
     @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<Person> listActive() {
         return personService.listActive();
     }
 
-    /**
-     * Lista todas las personas inactivas
-     */
     @GetMapping(value = "/inactive", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<Person> listInactive() {
         return personService.listInactive();
     }
 
-    /**
-     * Crea múltiples personas
-     */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Flux<Person>>> createPersons(@RequestBody Flux<Person> persons) {
         return Mono.just(ResponseEntity.status(HttpStatus.CREATED)
@@ -48,37 +39,27 @@ public class PersonController {
                         })));
     }
 
-    /**
-     * Elimina lógicamente una persona
-     */
-    @PatchMapping(value = "/delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    // Cambiado a DELETE
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Person>> logicallyDelete(@PathVariable Integer id) {
         return personService.logicallyDelete(id)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Reactiva una persona
-     */
-    @PatchMapping(value = "/active/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    // Cambiado a PUT y ajustada la ruta
+    @PutMapping(value = "/{id}/reactivate", produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Person>> reactivate(@PathVariable Integer id) {
         return personService.reactivate(id)
                 .map(ResponseEntity::ok)
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
-    /**
-     * Lista personas por familia
-     */
     @GetMapping(value = "/family/{familyId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<Person> listByFamily(@PathVariable Integer familyId) {
         return personService.listByFamily(familyId);
     }
 
-    /**
-     * Actualiza una persona
-     */
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<ResponseEntity<Person>> updatePerson(@PathVariable Integer id, @RequestBody Person updatedPerson) {
         return personService.updatePerson(id, updatedPerson)
