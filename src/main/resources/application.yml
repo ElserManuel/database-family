@@ -1,7 +1,6 @@
 spring:
   application:
     name: vg-ms-person
-
   r2dbc:
     # Conexión a bd Person
     url: ${R2DBC_URL} # r2dbc:postgresql://ep-morning-cake-a46o3cf8-pooler.us-east-1.aws.neon.tech:5432/neondb?sslmode=require
