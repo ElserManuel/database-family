@@ -41,3 +41,5 @@ jobs:
           KAFKA_USERNAME: ${{ secrets.KAFKA_USERNAME }}
           KAFKA_PASSWORD: ${{ secrets.KAFKA_PASSWORD }}
           FAMILY_SERVICE_URL: ${{ secrets.FAMILY_SERVICE_URL }}
+          
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=ElserManuel_database-family
