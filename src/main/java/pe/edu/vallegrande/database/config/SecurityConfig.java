@@ -28,10 +28,10 @@ public class SecurityConfig {
                 .cors(cors -> cors
                         .configurationSource(exchange -> {
                             var config = new CorsConfiguration();
-                            config.setAllowCredentials(false);
+                            config.setAllowCredentials(true);
                             // Permitir cualquier origen
                             // NOSONAR // Ignora reglas Sonar para esta línea
-                            config.setAllowedOriginPatterns(List.of("*"));
+                            config.setAllowedOriginPatterns(List.of("http://localhost:4200/"));
                             config.addAllowedHeader("*");
                             config.addAllowedMethod("*");
                             return config;
