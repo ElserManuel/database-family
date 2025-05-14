@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        // Variables de entorno para SonarCloud - usando credenciales seguras
+        // Variables de entorno para SonarCloud - el token debe estar configurado como credencial en Jenkins
         SONAR_TOKEN = credentials('SONAR_TOKEN')
 
         // Variables de entorno para R2DBC
@@ -54,10 +54,8 @@ pipeline {
             steps {
                 withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
                     sh '''
-                        mvn sonar:sonar \\
-                        -Dsonar.projectKey=database-family \\
-                        -Dsonar.projectName=database-family \\
-                        -Dsonar.organization=elsermanuel \\
+                        mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \\
+                        -Dsonar.projectKey=ElserManuel_database-family \\
                         -Dsonar.host.url=https://sonarcloud.io \\
                         -Dsonar.login=${SONAR_TOKEN}
                     '''
