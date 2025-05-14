@@ -1,24 +1,24 @@
-pipeline{
+pipeline {
     agent any
 
-    tools{
+    tools {
         maven 'Maven_3.8.6'
         jdk 'jdk17'
     }
 
-    environment  {
-        SONARQUBE = 'SonarQubeServer'
+    environment {
+        SONAR_TOKEN = credentials('SONAR_TOKEN') // Token creado en Jenkins
     }
 
     stages {
-        stage('clonar repositorio'){
+        stage('Clonar repositorio') {
             steps {
-                git url: 'https://github.com/ElserManuel/database-family.git' , branch:'PRS_person'
+                git url: 'https://github.com/ElserManuel/database-family.git', branch: 'PRS_person'
             }
         }
 
-        stage('Copilar Proyecto'){
-            steps{
+        stage('Compilar Proyecto') {
+            steps {
                 sh 'mvn clean compile'
             }
         }
@@ -29,18 +29,22 @@ pipeline{
             }
         }
 
-        stage('Generar Artefacto'){
+        stage('Generar Artefacto') {
             steps {
                 sh 'mvn package'
                 archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
             }
         }
 
-        stage('Analisis SonarQube'){
-            steps{
-                withSonarQubeEnv('SonarQubeServer') {
-                    sh 'mvn sonar:sonar -Dsonar.projectKey=mi-proyecto -Dsonar.host.url=http://localhost:9000 -Dsonar.login=TOKEN'
-                }
+        stage('Análisis SonarCloud') {
+            steps {
+                sh """
+                    mvn sonar:sonar \
+                    -Dsonar.projectKey=ELSERMANUEL_database-family \
+                    -Dsonar.organization=ELSERMANUEL \
+                    -Dsonar.host.url=https://sonarcloud.io \
+                    -Dsonar.login=$SONAR_TOKEN
+                """
             }
         }
 
