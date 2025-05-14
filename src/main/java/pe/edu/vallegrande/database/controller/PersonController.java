@@ -68,6 +68,6 @@ public class PersonController {
     }
 
     private void logError(String message, Throwable error) {
-        System.err.println(message + ": " + error.getMessage());
+        System.out.println(message + ": " + error.getMessage());
     }
 }
