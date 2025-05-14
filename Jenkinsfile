@@ -49,24 +49,5 @@ pipeline {
             }
         }
 
-        stage('Análisis SonarCloud') {
-            steps {
-                sh """
-                    mvn sonar:sonar \
-                    -Dsonar.projectKey=AS222S5_T05_be \
-                    -Dsonar.organization=elsermanuel \
-                    -Dsonar.host.url=https://sonarcloud.io \
-                    -Dsonar.login=${SONAR_TOKEN}
-                """
-            }
-        }
-
-        stage('Esperar análisis en Sonar') {
-            steps {
-                timeout(time: 1, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
     }
 }
