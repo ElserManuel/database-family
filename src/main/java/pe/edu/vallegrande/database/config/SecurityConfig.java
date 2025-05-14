@@ -28,7 +28,7 @@ public class SecurityConfig {
                 .cors(cors -> cors
                         .configurationSource(exchange -> {
                             var config = new CorsConfiguration();
-                            config.setAllowCredentials(true);
+                            config.setAllowCredentials(false);
                             // Permitir cualquier origen
                             // NOSONAR // Ignora reglas Sonar para esta línea
                             config.setAllowedOriginPatterns(List.of("*"));
