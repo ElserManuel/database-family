@@ -53,8 +53,8 @@ pipeline {
             steps {
                 sh """
                     mvn sonar:sonar \
-                    -Dsonar.projectKey=ELSERMANUEL_database-family \
-                    -Dsonar.organization=ELSERMANUEL \
+                    -Dsonar.projectKey=AS222S5_T05_be \
+                    -Dsonar.organization=elser-manuel-lazaro-rosa \
                     -Dsonar.host.url=https://sonarcloud.io \
                     -Dsonar.login=$SONAR_TOKEN
                 """
