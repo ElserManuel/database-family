@@ -51,14 +51,13 @@ pipeline {
 
         stage('Análisis SonarCloud') {
             steps {
-                withSonarQubeEnv('SonarCloud') {
-                    sh '''
-                        mvn sonar:sonar \
-                        -Dsonar.projectKey=AS222S5_T05_be \
-                        -Dsonar.organization=elsermanuel \
-                        -Dsonar.host.url=https://sonarcloud.io
-                    '''
-                }
+                sh """
+                    mvn sonar:sonar \
+                    -Dsonar.projectKey=AS222S5_T05_be \
+                    -Dsonar.organization=elsermanuel \
+                    -Dsonar.host.url=https://sonarcloud.io \
+                    -Dsonar.login=${SONAR_TOKEN}
+                """
             }
         }
 
