@@ -20,7 +20,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
-public class PersonControllerTest {
+ class PersonControllerTest {
 
     private WebTestClient webTestClient;
 
@@ -31,13 +31,13 @@ public class PersonControllerTest {
     private PersonController personController;
 
     @BeforeEach
-    public void setUp() {
+     void setUp() {
         MockitoAnnotations.openMocks(this);
         webTestClient = WebTestClient.bindToController(personController).build();
     }
 
     @Test
-    public void testGetActivePersons() {
+     void testGetActivePersons() {
         // Datos de prueba
         List<Person> persons = new ArrayList<>();
         persons.add(new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
@@ -60,7 +60,7 @@ public class PersonControllerTest {
     }
 
     @Test
-    public void testGetInactivePersons() {
+     void testGetInactivePersons() {
         // Datos de prueba
         List<Person> persons = new ArrayList<>();
         persons.add(new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
@@ -83,7 +83,7 @@ public class PersonControllerTest {
     }
 
     @Test
-    public void testCreatePersons() {
+     void testCreatePersons() {
         // Datos de prueba
         List<Person> inputPersons = new ArrayList<>();
         inputPersons.add(new Person(null, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
@@ -113,7 +113,7 @@ public class PersonControllerTest {
     }
 
     @Test
-    public void testUpdatePerson() {
+     void testUpdatePerson() {
         // Datos de prueba
         Person updateRequest = new Person(null, "Juan Carlos", "Pérez Gómez", 31,
                 LocalDate.of(1993, 1, 1), "DNI", "12345678", "Padre", "No", "A", 2);
@@ -136,7 +136,7 @@ public class PersonControllerTest {
     }
 
     @Test
-    public void testDeletePerson() {
+     void testDeletePerson() {
         // Datos de prueba
         Person deletedPerson = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
                 "DNI", "12345678", "Padre", "No", "I", 1);
@@ -154,7 +154,7 @@ public class PersonControllerTest {
     }
 
     @Test
-    public void testReactivatePerson() {
+     void testReactivatePerson() {
         // Datos de prueba
         Person reactivatedPerson = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
                 "DNI", "12345678", "Padre", "No", "A", 1);
@@ -172,7 +172,7 @@ public class PersonControllerTest {
     }
 
     @Test
-    public void testGetPersonsByFamilyId() {
+     void testGetPersonsByFamilyId() {
         // Datos de prueba
         List<Person> familyMembers = new ArrayList<>();
         familyMembers.add(new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),

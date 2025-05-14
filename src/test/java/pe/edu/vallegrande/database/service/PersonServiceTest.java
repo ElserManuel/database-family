@@ -17,7 +17,7 @@ import java.time.LocalDate;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-public class PersonServiceTest {
+ class PersonServiceTest {
 
     @Mock
     private PersonRepository personRepository;
@@ -29,12 +29,12 @@ public class PersonServiceTest {
     private PersonService personService;
 
     @BeforeEach
-    public void setUp() {
+     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testListActive() {
+     void testListActive() {
         // Datos de prueba
         Person person1 = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
                 "DNI", "12345678", "Padre", "No", "A", 1);
@@ -55,7 +55,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void testListInactive() {
+     void testListInactive() {
         // Datos de prueba
         Person person1 = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
                 "DNI", "12345678", "Padre", "No", "I", 1);
@@ -76,7 +76,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void testCreatePersons_WithValidFamily() {
+     void testCreatePersons_WithValidFamily() {
         // Datos de prueba
         Person person = new Person(null, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
                 "DNI", "12345678", "Padre", "No", null, 1);
@@ -97,7 +97,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void testCreatePersons_WithInvalidFamily() {
+    void testCreatePersons_WithInvalidFamily() {
         // Datos de prueba
         Person person = new Person(null, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
                 "DNI", "12345678", "Padre", "No", null, 999);
@@ -117,7 +117,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void testCreatePersons_WithoutFamily() {
+     void testCreatePersons_WithoutFamily() {
         // Datos de prueba
         Person person = new Person(null, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
                 "DNI", "12345678", "Padre", "No", null, null);
@@ -137,7 +137,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void testLogicallyDelete() {
+     void testLogicallyDelete() {
         // Datos de prueba
         Person person = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
                 "DNI", "12345678", "Padre", "No", "A", 1);
@@ -158,7 +158,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void testReactivate() {
+     void testReactivate() {
         // Datos de prueba
         Person person = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
                 "DNI", "12345678", "Padre", "No", "I", 1);
@@ -179,7 +179,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void testListByFamily() {
+     void testListByFamily() {
         // Datos de prueba
         Person person1 = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
                 "DNI", "12345678", "Padre", "No", "A", 1);
@@ -200,7 +200,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void testUpdatePerson() {
+     void testUpdatePerson() {
         // Datos de prueba
         Person originalPerson = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
                 "DNI", "12345678", "Padre", "No", "A", 1);
@@ -223,7 +223,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void testDeletePersonsByFamilyId() {
+     void testDeletePersonsByFamilyId() {
         // Datos de prueba
         Person person1 = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
                 "DNI", "12345678", "Padre", "No", "A", 1);
@@ -250,7 +250,7 @@ public class PersonServiceTest {
     }
 
     @Test
-    public void testReactivatePersonsByFamilyId() {
+     void testReactivatePersonsByFamilyId() {
         // Datos de prueba
         Person person1 = new Person(1, "Juan", "Pérez", 30, LocalDate.of(1993, 1, 1),
                 "DNI", "12345678", "Padre", "No", "I", 1);
