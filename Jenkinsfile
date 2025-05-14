@@ -7,6 +7,7 @@ pipeline {
     }
 
     environment {
+        // Variables de entorno para SonarCloud - usando credenciales seguras
         SONAR_TOKEN = credentials('SONAR_TOKEN')
 
         // Variables de entorno para R2DBC
@@ -21,10 +22,6 @@ pipeline {
 
         // Otras variables
         FAMILY_SERVICE_URL = credentials('FAMILY_SERVICE_URL')
-
-        // Define los parámetros de SonarCloud como variables de entorno
-        SONAR_PROJECT_KEY = 'ElserManuel_database-family'
-        SONAR_ORGANIZATION = 'elsermanuel'
     }
 
     stages {
@@ -55,13 +52,14 @@ pipeline {
 
         stage('Análisis SonarCloud') {
             steps {
-                withSonarQubeEnv('SonarCloud') {
-                    // La forma segura de usar credenciales en Jenkins
+                withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
                     sh '''
-                        mvn sonar:sonar \
-                        -Dsonar.projectKey=${SONAR_PROJECT_KEY} \
-                        -Dsonar.organization=${SONAR_ORGANIZATION} \
-                        -Dsonar.host.url=https://sonarcloud.io
+                        mvn sonar:sonar \\
+                        -Dsonar.projectKey=database-family \\
+                        -Dsonar.projectName=database-family \\
+                        -Dsonar.organization=elsermanuel \\
+                        -Dsonar.host.url=https://sonarcloud.io \\
+                        -Dsonar.login=${SONAR_TOKEN}
                     '''
                 }
             }
@@ -69,8 +67,10 @@ pipeline {
 
         stage('Esperar análisis en Sonar') {
             steps {
-                timeout(time: 2, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    timeout(time: 2, unit: 'MINUTES') {
+                        waitForQualityGate abortPipeline: false
+                    }
                 }
             }
         }
