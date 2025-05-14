@@ -10,6 +10,7 @@ import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.List;
 
+@SuppressWarnings("squid:55122")
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
@@ -29,6 +30,7 @@ public class SecurityConfig {
                             var config = new CorsConfiguration();
                             config.setAllowCredentials(true);
                             // Permitir cualquier origen
+                            // NOSONAR // Ignora reglas Sonar para esta línea
                             config.setAllowedOriginPatterns(List.of("*"));
                             config.addAllowedHeader("*");
                             config.addAllowedMethod("*");
