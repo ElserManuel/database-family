@@ -56,7 +56,7 @@ pipeline {
                     sh '''
                         mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \\
                         -Dsonar.projectKey=ElserManuel_database-family \\
-                        -Dsonar.organization=TU_ORGANIZACION_EN_SONARCLOUD \\
+                        -Dsonar.organization=elsermanuel \\
                         -Dsonar.host.url=https://sonarcloud.io \\
                         -Dsonar.login=${SONAR_TOKEN}
                     '''
