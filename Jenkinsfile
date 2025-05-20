@@ -64,6 +64,13 @@ pipeline {
             }
         }
 
+        stage('Verificar envío a SonarCloud') {
+            steps {
+                sh 'echo "Verificando logs para confirmar envío a SonarCloud"'
+                sh 'mvn sonar:sonar -X | grep "ANALYSIS SUCCESSFUL"'
+            }
+        }
+
         stage('Esperar análisis en Sonar') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
