@@ -17,6 +17,9 @@ pipeline {
         KAFKA_PASSWORD = credentials('KAFKA_PASSWORD')
         // Otras variables
         FAMILY_SERVICE_URL = credentials('FAMILY_SERVICE_URL')
+        
+        // Configuración del webhook de SonarQube
+        SONAR_WEBHOOK_SECRET = credentials('SONAR_WEBHOOK_SECRET')
     }
     stages {
         stage('Clonar repositorio') {
@@ -42,23 +45,20 @@ pipeline {
         }
         stage('Análisis SonarCloud') {
             steps {
-                withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+                withSonarQubeEnv('SonarCloud') {
                     sh '''
                         mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \\
                         -Dsonar.projectKey=ElserManuel_database-family \\
                         -Dsonar.organization=elsermanuel \\
-                        -Dsonar.host.url=https://sonarcloud.io \\
-                        -Dsonar.login=${SONAR_TOKEN}
+                        -Dsonar.host.url=https://sonarcloud.io
                     '''
                 }
             }
         }
-        stage('Esperar análisis en Sonar') {
+        stage('Verificar Calidad') {
             steps {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    timeout(time: 2, unit: 'MINUTES') {
-                        waitForQualityGate abortPipeline: false
-                    }
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: false
                 }
             }
         }
